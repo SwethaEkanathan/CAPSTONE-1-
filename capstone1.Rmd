@@ -1,0 +1,173 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+1. There is a relationship between the buying price and car acceptability.
+2. Safety ratings significantly impact car acceptability.
+3. Maintenance cost influences the overall evaluation of cars.
+4. Relationship between the Number of Doors and Car Acceptability.
+5. Association between Safety and Maintenance Costs
+6. Correlation between Buying Price and Technical Characteristics.
+7. Influence of the Number of Persons on Car Acceptability.
+8. Analysis of Acceptability Across Different Maintenance and Safety Levels.
+9. Identification of Ideal Car Characteristics for 'Good' and 'Very Good' Ratings.
+10. Impact of Luggage Boot Size on Car Acceptability
+```{r}
+columns <-c("buying","maint","doors","persons","lug_boot","safety","class")
+
+df <- read.csv('data/car.data',col.names = columns)
+```
+
+```{r}
+# Display the first few rows of the dataset
+head(df)
+```
+```{r}
+# Check for missing values
+summary(is.na(df))
+```
+
+```{r}
+# Explore basic statistics of numerical attributes
+summary(df)
+
+```
+
+
+```{r}
+# Explore unique values in categorical attributes
+sapply(df, function(x) length(unique(x)))
+```
+
+
+```{r}
+# Explore class distribution
+table(df$class)
+
+```
+
+```{r}
+# Data Visualization 
+library(ggplot2)
+```
+
+```{r}
+# Scatterplot to visualize relationships between numerical variables
+ggplot(df, aes(x = buying, y = maint, color = class)) +
+  geom_point() +
+  ggtitle("Relationship between Buying and Maintenance Costs") +
+  theme_minimal()
+
+```
+
+```{r}
+
+# Barplot to visualize class distribution
+ggplot(df, aes(x = class)) +
+  geom_bar() +
+  ggtitle("Class Distribution") +
+  theme_minimal()
+```
+
+
+```{r}
+
+# Convert 'buying' and 'class' to ordered factors
+df$buying <- factor(df$buying, levels=c('low', 'med', 'high', 'vhigh'), ordered=TRUE)
+df$class <- factor(df$class, levels=c('unacc', 'acc', 'good', 'vgood'), ordered=TRUE)
+
+# Boxplot for buying price vs. car acceptability
+boxplot(class ~ buying, data = df, order = c('low', 'med', 'high', 'vhigh'),
+        main = 'Relationship between Buying Price and Car Acceptability',
+        xlab = 'Buying Price', ylab = 'Car Acceptability')
+
+
+```
+
+
+```{r}
+# count plotst for safety vs. car acceptability
+contingency_table <- table(df$safety, df$class)
+barplot(contingency_table, beside=TRUE, col=rainbow(length(unique(df$class))), legend=rownames(contingency_table),
+        main='Impact of Safety Ratings on Car Acceptability', xlab='Safety', ylab='Count')
+
+```
+
+
+```{r}
+# Visualization of maintenance vs. car acceptability
+ggplot(df, aes(x=maint, fill=class, order=maint)) +
+  geom_bar(position='stack') +
+  labs(title='Influence of Maintenance Cost on Car Acceptability') +
+  theme_minimal()
+
+```
+
+```{r}
+# Stacked bar chart for number of doors vs. car acceptability
+contingency_table_doors <- table(df$doors, df$class)
+barplot(contingency_table_doors, beside=TRUE, col=rainbow(length(unique(df$class))), legend=rownames(contingency_table_doors),
+        main='Relationship between Number of Doors and Car Acceptability', xlab='Number of Doors', ylab='Count')
+
+```
+
+```{r}
+# Convert categorical variables to numeric
+df$doors <- as.numeric(factor(df$doors))
+df$persons <- as.numeric(factor(df$persons))
+df$lug_boot <- as.numeric(factor(df$lug_boot))
+
+# Scatterplot matrix with different colors for 'buying'
+pairs(df[, c("doors", "persons", "lug_boot")], col = as.numeric(factor(df$buying)))
+
+```
+
+
+
+```{r}
+# Stacked bar chart for number of persons vs. car acceptability
+contingency_table_persons <- table(df$persons, df$class)
+barplot(contingency_table_persons, beside=TRUE, col=rainbow(length(unique(df$class))), legend=rownames(contingency_table_persons),
+        main='Influence of Number of Persons on Car Acceptability', xlab='Number of Persons', ylab='Count')
+
+```
+
+
+
+
+
+
+```{r}
+# Filter dataset for 'good' and 'v-good' ratings
+high_rated_cars <- subset(df, class %in% c('good', 'v-good'))
+
+# Display characteristics of high-rated cars
+summary(high_rated_cars)
+
+```
+
+
+
+
+
+
+```{r}
+# Stacked bar chart for luggage boot size vs. car acceptability
+contingency_table_boot <- table(df$lug_boot, df$class)
+barplot(contingency_table_boot, beside=TRUE, col=rainbow(length(unique(df$class))), legend=rownames(contingency_table_boot),
+        main='Impact of Luggage Boot Size on Car Acceptability', xlab='Luggage Boot Size', ylab='Count')
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
